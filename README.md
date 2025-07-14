@@ -1,5 +1,5 @@
 # Raiden Shogun Archive
-Web & Android app dedicated to Her Excellency, where i pour my all my thoughts about her  
+Web & Android app dedicated to Her Excellency, where i pour all my thoughts about her  
 Deployed via https://raiden-shogun-archive.vercel.app/  
 and downloadable as Android APK
 
