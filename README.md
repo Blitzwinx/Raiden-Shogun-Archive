@@ -16,9 +16,10 @@ Initially was not intended for public viewing and served only as my private note
 - Blogs (Thoughts & Theories)
 
 ### TODO
-- [ ] Improve text formatting
+- [x] Improve text formatting
 - [ ] Implement user accounts for public space (comment section)
 - [ ] Add scrollable bullet points of lore in chronological order
 - [ ] Improve UI (showcase multiple Raiden forms & clean flat color)
+- [ ] Improve mobile responsiveness
 - [ ] Post pinning
 - [ ] AI Chatbot of Raiden Shogun

@@ -11,6 +11,83 @@ body {
   background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
   color: white;
   overflow-x: hidden;
+  line-height: 1.6;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Typography System */
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+  margin-bottom: 0.75rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+p {
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+}
+
+/* Consistent spacing system - 8px base unit */
+.space-y-1 > * + * { margin-top: 0.25rem; }
+.space-y-2 > * + * { margin-top: 0.5rem; }
+.space-y-3 > * + * { margin-top: 0.75rem; }
+.space-y-4 > * + * { margin-top: 1rem; }
+.space-y-6 > * + * { margin-top: 1.5rem; }
+.space-y-8 > * + * { margin-top: 2rem; }
+
+/* Section separators */
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent 0%, rgba(139, 92, 246, 0.3) 20%, rgba(139, 92, 246, 0.6) 50%, rgba(139, 92, 246, 0.3) 80%, transparent 100%);
+  margin: 3rem 0;
+  position: relative;
+}
+
+.section-divider::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60px;
+  height: 3px;
+  background: linear-gradient(90deg, #8b5cf6, #a855f7, #8b5cf6);
+  border-radius: 2px;
+  box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+}
+
+.section-divider-simple {
+  width: 100%;
+  height: 1px;
+  background: rgba(139, 92, 246, 0.3);
+  margin: 2rem 0;
+  position: relative;
+}
+
+.section-divider-simple::after {
+  content: '';
+  position: absolute;
+  top: -0.5px;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(139, 92, 246, 0.2) 50%, transparent 100%);
+}
+
+/* Content containers with proper spacing */
+.content-section {
+  margin-bottom: 3rem;
+}
+
+.content-section:last-child {
+  margin-bottom: 0;
 }
 
 .stars-bg {
@@ -146,6 +223,7 @@ body {
   word-wrap: break-word;
   word-break: break-word;
   hyphens: auto;
+  line-height: 1.5;
 }
 
 .line-clamp-4 {
@@ -157,7 +235,9 @@ body {
   word-wrap: break-word;
   word-break: break-word;
   hyphens: auto;
+  line-height: 1.5;
 }
+
 
 /* Ensure text stays within containers */
 .text-container {
@@ -166,4 +246,147 @@ body {
   overflow-wrap: break-word;
   hyphens: auto;
   max-width: 100%;
+  line-height: 1.6;
+}
+
+/* Mobile-first responsive typography */
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  
+  h1 {
+    font-size: 2rem;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+  
+  h3 {
+    font-size: 1.25rem;
+    line-height: 1.3;
+    margin-bottom: 0.5rem;
+  }
+  
+  p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  
+  .text-container {
+    padding: 0 0.5rem;
+  }
+  
+  .section-divider {
+    margin: 1.5rem 0;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 768px) {
+  h1 {
+    font-size: 2.5rem;
+    line-height: 1.1;
+  }
+  
+  h2 {
+    font-size: 1.875rem;
+    line-height: 1.2;
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+    line-height: 1.3;
+  }
+}
+
+@media (min-width: 769px) {
+  h1 {
+    font-size: 3rem;
+    line-height: 1.1;
+  }
+  
+  h2 {
+    font-size: 2.25rem;
+    line-height: 1.2;
+  }
+  
+  h3 {
+    font-size: 1.875rem;
+    line-height: 1.3;
+  }
+}
+
+/* Improved card spacing and alignment */
+.card-content {
+  padding: 1.5rem;
+  text-align: left;
+}
+
+.card-content h3 {
+  margin-bottom: 0.75rem;
+  text-align: left;
+}
+
+.card-content p {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+/* Button and link spacing */
+.btn-group {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+@media (max-width: 640px) {
+  .btn-group {
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .btn-group > * {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* Consistent form spacing */
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: rgba(17, 24, 39, 0.8);
+  color: white;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: rgba(139, 92, 246, 0.6);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
 }

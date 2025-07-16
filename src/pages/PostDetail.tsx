@@ -79,51 +79,54 @@ const PostDetail = () => {
         {/* Back Button */}
         <Link
           to={`/${post.category}`}
-          className="inline-flex items-center space-x-2 text-purple-400 hover:text-purple-300 mb-8 transition-colors"
+          className="inline-flex items-center space-x-2 text-purple-400 hover:text-purple-300 mb-6 sm:mb-8 transition-colors text-sm sm:text-base text-container"
         >
           <ArrowLeft className="h-5 w-5" />
           <span>Back to {post.category}</span>
         </Link>
 
         {/* Article */}
-        <article className="glass-morphism border-2 border-purple-500/30 rounded-2xl p-8 fade-in">
+        <article className="glass-morphism border-2 border-purple-500/30 rounded-2xl p-4 sm:p-6 lg:p-8 fade-in">
           {/* Header */}
-          <div className="mb-8">
+          <div className="mb-6 sm:mb-8">
             <div className="flex items-center space-x-3 mb-4">
               <span className={`px-3 py-1 rounded-full text-sm font-medium ${getCategoryColor(post.category)}`}>
                 {post.category}
               </span>
-              <div className="flex items-center space-x-2 text-purple-400 text-sm">
+              <div className="flex items-center space-x-2 text-purple-400 text-xs sm:text-sm text-container">
                 <Calendar className="h-4 w-4" />
                 <span>{formatDate(post.created_at)}</span>
               </div>
-              <div className="flex items-center space-x-2 text-purple-400 text-sm">
+              <div className="flex items-center space-x-2 text-purple-400 text-xs sm:text-sm text-container">
                 <Clock className="h-4 w-4" />
                 <span>5 min read</span>
               </div>
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold text-white heading-font mb-4">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-white heading-font mb-4 text-container">
               {post.title}
             </h1>
           </div>
 
+          {/* Section Divider */}
+          <div className="section-divider-simple"></div>
+
           {/* Content */}
           <MarkdownRenderer 
             content={post.content} 
-            className="prose-lg"
+            className="prose-sm sm:prose-base lg:prose-lg"
           />
 
           {/* Footer */}
-          <div className="mt-12 pt-8 border-t border-purple-500/30">
-            <div className="flex items-center justify-between">
-              <div className="text-sm text-gray-400">
+          <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-purple-500/30">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="text-xs sm:text-sm text-gray-400 text-container">
                 {post.updated_at !== post.created_at && (
                   <span>Last updated: {formatDate(post.updated_at)}</span>
                 )}
               </div>
               <Link
                 to={`/${post.category}`}
-                className="inline-flex items-center space-x-2 text-purple-400 hover:text-purple-300 transition-colors"
+                className="inline-flex items-center space-x-2 text-purple-400 hover:text-purple-300 transition-colors text-sm sm:text-base text-container"
               >
                 <span>More {post.category} posts</span>
                 <ArrowLeft className="h-4 w-4 rotate-180" />

@@ -1,5 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { Image, Bold, Italic, List, Link, Settings } from 'lucide-react';
+import { 
+  Image, Bold, Italic, List, Link, Settings, 
+  Minus, Sparkles, AlignLeft, AlignCenter, AlignRight,
+  Type, ChevronDown
+} from 'lucide-react';
 import { imageService } from '../services/imageService';
 
 interface RichTextEditorProps {
@@ -17,6 +21,7 @@ interface ImageSizeModal {
 
 const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, postId }) => {
   const [isUploading, setIsUploading] = useState(false);
+  const [showFontSizeDropdown, setShowFontSizeDropdown] = useState(false);
   const [imageSizeModal, setImageSizeModal] = useState<ImageSizeModal>({
     isOpen: false,
     imageUrl: '',
@@ -34,6 +39,16 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, postId
     { value: 'custom', label: 'Custom Size', width: 'custom' }
   ];
 
+  const fontSizes = [
+    { value: 'xs', label: 'Extra Small', class: 'text-xs' },
+    { value: 'sm', label: 'Small', class: 'text-sm' },
+    { value: 'base', label: 'Normal', class: 'text-base' },
+    { value: 'lg', label: 'Large', class: 'text-lg' },
+    { value: 'xl', label: 'Extra Large', class: 'text-xl' },
+    { value: '2xl', label: 'XX Large', class: 'text-2xl' },
+    { value: '3xl', label: 'XXX Large', class: 'text-3xl' }
+  ];
+
   const insertText = (before: string, after: string = '') => {
     const textarea = textareaRef.current;
     if (!textarea) return;
@@ -45,11 +60,105 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, postId
     const newText = value.substring(0, start) + before + selectedText + after + value.substring(end);
     onChange(newText);
 
-    // Restore cursor position
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length);
-    }, 0);
+    // Restore cursor position without scrolling
+    requestAnimationFrame(() => {
+      if (textarea) {
+        const newStart = start + before.length;
+        const newEnd = start + before.length + selectedText.length;
+        textarea.setSelectionRange(newStart, newEnd);
+        // Don't call focus() to prevent scrolling
+      }
+    });
+  };
+
+  const insertBlockElement = (element: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const beforeCursor = value.substring(0, start);
+    const afterCursor = value.substring(start);
+    
+    // Add newlines before and after if needed
+    const needsNewlineBefore = beforeCursor.length > 0 && !beforeCursor.endsWith('\n');
+    const needsNewlineAfter = afterCursor.length > 0 && !afterCursor.startsWith('\n');
+    
+    const elementToInsert = 
+      (needsNewlineBefore ? '\n' : '') + 
+      element + 
+      (needsNewlineAfter ? '\n' : '');
+    
+    const newText = beforeCursor + elementToInsert + afterCursor;
+    onChange(newText);
+
+    // Position cursor after the inserted element without scrolling
+    requestAnimationFrame(() => {
+      if (textarea) {
+        const newPosition = start + elementToInsert.length;
+        textarea.setSelectionRange(newPosition, newPosition);
+        // Don't call focus() to prevent scrolling
+      }
+    });
+  };
+
+  const insertAlignment = (alignment: 'left' | 'center' | 'right') => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = value.substring(start, end);
+    
+    if (selectedText.trim()) {
+      // Wrap selected text
+      insertText(`[align=${alignment}]`, `[/align]`);
+    } else {
+      // Insert empty alignment tags
+      const before = `[align=${alignment}]`;
+      const after = `[/align]`;
+      const newText = value.substring(0, start) + before + after + value.substring(end);
+      onChange(newText);
+      
+      // Position cursor between tags without scrolling
+      requestAnimationFrame(() => {
+        if (textarea) {
+          const newPosition = start + before.length;
+          textarea.setSelectionRange(newPosition, newPosition);
+          // Don't call focus() to prevent scrolling
+        }
+      });
+    }
+  };
+
+  const insertFontSize = (size: string) => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = value.substring(start, end);
+    
+    if (selectedText.trim()) {
+      // Wrap selected text
+      insertText(`[size=${size}]`, `[/size]`);
+    } else {
+      // Insert empty size tags
+      const before = `[size=${size}]`;
+      const after = `[/size]`;
+      const newText = value.substring(0, start) + before + after + value.substring(end);
+      onChange(newText);
+      
+      // Position cursor between tags without scrolling
+      requestAnimationFrame(() => {
+        if (textarea) {
+          const newPosition = start + before.length;
+          textarea.setSelectionRange(newPosition, newPosition);
+          // Don't call focus() to prevent scrolling
+        }
+      });
+    }
+    
+    setShowFontSizeDropdown(false);
   };
 
   const insertImageWithSize = (imageUrl: string, altText: string, size: string, customWidth?: string) => {
@@ -70,6 +179,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, postId
       const cursorPos = textarea.selectionStart;
       const newValue = value.substring(0, cursorPos) + imageMarkdown + value.substring(cursorPos);
       onChange(newValue);
+      
+      // Position cursor after the inserted image without scrolling
+      requestAnimationFrame(() => {
+        if (textarea) {
+          const newPosition = cursorPos + imageMarkdown.length;
+          textarea.setSelectionRange(newPosition, newPosition);
+          // Don't call focus() to prevent scrolling
+        }
+      });
     }
   };
 
@@ -161,62 +279,171 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, postId
     }
   };
 
+  // Handle dropdown toggle without affecting textarea focus
+  const toggleFontSizeDropdown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowFontSizeDropdown(!showFontSizeDropdown);
+  };
+
+  // Handle button clicks without affecting textarea focus
+  const handleButtonClick = (e: React.MouseEvent, action: () => void) => {
+    e.preventDefault();
+    action();
+  };
+
   return (
     <div className="space-y-3">
       {/* Toolbar */}
-      <div className="flex items-center space-x-2 p-3 bg-gray-800 border border-purple-500/30 rounded-lg">
-        <button
-          type="button"
-          onClick={() => insertText('**', '**')}
-          className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
-          title="Bold"
-        >
-          <Bold className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => insertText('*', '*')}
-          className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
-          title="Italic"
-        >
-          <Italic className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => insertText('\n- ', '')}
-          className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
-          title="List"
-        >
-          <List className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          onClick={() => insertText('[', '](url)')}
-          className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
-          title="Link"
-        >
-          <Link className="h-4 w-4" />
-        </button>
-        <div className="w-px h-6 bg-gray-600"></div>
-        <button
-          type="button"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={isUploading || !postId}
-          className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors disabled:opacity-50"
-          title="Insert Image"
-        >
-          <Image className="h-4 w-4" />
-        </button>
-        <button
-          type="button"
-          onClick={editExistingImage}
-          className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
-          title="Edit Selected Image Size"
-        >
-          <Settings className="h-4 w-4" />
-        </button>
+      <div className="flex flex-wrap items-center gap-2 p-3 bg-gray-800 border border-purple-500/30 rounded-lg">
+        {/* Text Formatting */}
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onMouseDown={(e) => handleButtonClick(e, () => insertText('**', '**'))}
+            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+            title="Bold"
+          >
+            <Bold className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => handleButtonClick(e, () => insertText('*', '*'))}
+            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+            title="Italic"
+          >
+            <Italic className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="hidden sm:block w-px h-6 bg-gray-600"></div>
+
+        {/* Font Size Dropdown */}
+        <div className="relative">
+          <button
+            type="button"
+            onMouseDown={toggleFontSizeDropdown}
+            className="flex items-center space-x-1 p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+            title="Font Size"
+          >
+            <Type className="h-4 w-4" />
+            <ChevronDown className="h-3 w-3" />
+          </button>
+          
+          {showFontSizeDropdown && (
+            <div className="absolute top-full left-0 mt-1 bg-gray-800 border border-purple-500/30 rounded-lg shadow-lg z-10 min-w-[140px]">
+              {fontSizes.map((size) => (
+                <button
+                  key={size.value}
+                  type="button"
+                  onMouseDown={(e) => handleButtonClick(e, () => insertFontSize(size.value))}
+                  className="w-full text-left px-3 py-2 text-gray-300 hover:text-white hover:bg-gray-700 transition-colors first:rounded-t-lg last:rounded-b-lg"
+                >
+                  <span className={`${size.class} text-container`}>{size.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div className="hidden sm:block w-px h-6 bg-gray-600"></div>
+
+        {/* Text Alignment */}
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onMouseDown={(e) => handleButtonClick(e, () => insertAlignment('left'))}
+            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+            title="Align Left"
+          >
+            <AlignLeft className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => handleButtonClick(e, () => insertAlignment('center'))}
+            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+            title="Align Center"
+          >
+            <AlignCenter className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => handleButtonClick(e, () => insertAlignment('right'))}
+            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+            title="Align Right"
+          >
+            <AlignRight className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="hidden sm:block w-px h-6 bg-gray-600"></div>
+
+        {/* Lists and Links */}
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onMouseDown={(e) => handleButtonClick(e, () => insertText('\n- ', ''))}
+            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+            title="List"
+          >
+            <List className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => handleButtonClick(e, () => insertText('[', '](url)'))}
+            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+            title="Link"
+          >
+            <Link className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="hidden sm:block w-px h-6 bg-gray-600"></div>
+
+        {/* Section Dividers */}
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onMouseDown={(e) => handleButtonClick(e, () => insertBlockElement('[divider-simple]'))}
+            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+            title="Simple Divider"
+          >
+            <Minus className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => handleButtonClick(e, () => insertBlockElement('[divider-gradient]'))}
+            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+            title="Gradient Divider"
+          >
+            <Sparkles className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="hidden sm:block w-px h-6 bg-gray-600"></div>
+
+        {/* Images */}
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onMouseDown={(e) => handleButtonClick(e, () => fileInputRef.current?.click())}
+            disabled={isUploading || !postId}
+            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors disabled:opacity-50"
+            title="Insert Image"
+          >
+            <Image className="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            onMouseDown={(e) => handleButtonClick(e, editExistingImage)}
+            className="p-2 text-gray-400 hover:text-white hover:bg-gray-700 rounded transition-colors"
+            title="Edit Selected Image Size"
+          >
+            <Settings className="h-4 w-4" />
+          </button>
+        </div>
+
         {isUploading && (
-          <span className="text-sm text-purple-400">Uploading to cloud...</span>
+          <span className="text-xs sm:text-sm text-purple-400 text-container">Uploading to cloud...</span>
         )}
       </div>
 
@@ -228,19 +455,19 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, postId
           onChange={(e) => onChange(e.target.value)}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
-          className="w-full px-4 py-3 bg-gray-800 border border-purple-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[300px] resize-vertical"
-          placeholder="Write your content here... You can use Markdown formatting and drag & drop images."
+          className="w-full px-4 py-3 bg-gray-800 border border-purple-500/30 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 min-h-[250px] sm:min-h-[300px] resize-vertical text-sm sm:text-base text-container"
+          placeholder="Write your content here... You can use Markdown formatting, custom alignment, font sizes, section dividers, and drag & drop images."
         />
-        <div className="absolute bottom-3 right-3 text-xs text-gray-500">
-          Supports Markdown • Drag & drop images • Cloud storage • Resizable images
+        <div className="absolute bottom-3 right-3 text-xs text-gray-500 text-container hidden sm:block">
+          Enhanced formatting • Section dividers • Text alignment • Font sizes • Cloud storage
         </div>
       </div>
 
       {/* Image Size Selection Modal */}
       {imageSizeModal.isOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-gray-900 border-2 border-purple-500/30 rounded-2xl p-6 w-full max-w-md mx-4">
-            <h3 className="text-xl font-bold text-white mb-4">Choose Image Size</h3>
+          <div className="bg-gray-900 border-2 border-purple-500/30 rounded-2xl p-4 sm:p-6 w-full max-w-md mx-4">
+            <h3 className="text-lg sm:text-xl font-bold text-white mb-4 text-container">Choose Image Size</h3>
             
             {/* Image Preview */}
             <div className="mb-4 p-4 bg-gray-800 rounded-lg">
@@ -249,7 +476,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, postId
                 alt={imageSizeModal.altText}
                 className="w-full h-32 object-cover rounded"
               />
-              <p className="text-sm text-gray-400 mt-2 truncate">{imageSizeModal.altText}</p>
+              <p className="text-xs sm:text-sm text-gray-400 mt-2 truncate text-container">{imageSizeModal.altText}</p>
             </div>
 
             {/* Size Options */}
@@ -260,19 +487,19 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, postId
                   onClick={() => handleSizeSelection(size.value)}
                   className="w-full text-left p-3 bg-gray-800 hover:bg-gray-700 border border-purple-500/30 hover:border-purple-400/50 rounded-lg transition-colors"
                 >
-                  <div className="font-medium text-white">{size.label}</div>
-                  <div className="text-sm text-gray-400">Max width: {size.width}</div>
+                  <div className="font-medium text-white text-sm sm:text-base text-container">{size.label}</div>
+                  <div className="text-xs sm:text-sm text-gray-400 text-container">Max width: {size.width}</div>
                 </button>
               ))}
               
               {/* Custom Size Option */}
               <div className="p-3 bg-gray-800 border border-purple-500/30 rounded-lg">
-                <div className="font-medium text-white mb-2">Custom Size</div>
+                <div className="font-medium text-white mb-2 text-sm sm:text-base text-container">Custom Size</div>
                 <div className="flex space-x-2">
                   <input
                     type="text"
                     placeholder="e.g., 400px, 50%, 20rem"
-                    className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-purple-500"
+                    className="flex-1 px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white placeholder-gray-400 focus:outline-none focus:border-purple-500 text-sm text-container"
                     onKeyPress={(e) => {
                       if (e.key === 'Enter') {
                         const input = e.target as HTMLInputElement;
@@ -289,12 +516,12 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, postId
                         handleSizeSelection('custom', input.value.trim());
                       }
                     }}
-                    className="px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition-colors"
+                    className="px-3 sm:px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded transition-colors text-sm text-container"
                   >
                     Apply
                   </button>
                 </div>
-                <div className="text-xs text-gray-500 mt-1">
+                <div className="text-xs text-gray-500 mt-1 text-container">
                   Examples: 300px, 50%, 25rem, 80vw
                 </div>
               </div>
@@ -303,7 +530,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, postId
             {/* Cancel Button */}
             <button
               onClick={() => setImageSizeModal({ isOpen: false, imageUrl: '', altText: '', currentSize: 'medium' })}
-              className="w-full px-4 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors"
+              className="w-full px-4 py-2 border border-gray-600 rounded-lg text-gray-300 hover:bg-gray-800 transition-colors text-sm sm:text-base text-container"
             >
               Cancel
             </button>
@@ -320,14 +547,31 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({ value, onChange, postId
         className="hidden"
       />
 
-      {/* Help text */}
-      <div className="text-sm text-gray-400 space-y-1">
-        <p><strong>Formatting tips:</strong></p>
-        <p>• **bold text** • *italic text* • [link text](url)</p>
-        <p>• Images: Upload via button or drag & drop • Choose size after upload</p>
-        <p>• Edit existing images: Select the image and click the settings button</p>
-        <p>• Max image size: 5MB • Supported: JPG, PNG, GIF, WebP</p>
+      {/* Enhanced Help text */}
+      <div className="text-xs sm:text-sm text-gray-400 space-y-2 text-container">
+        <p><strong>Enhanced Formatting Options:</strong></p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+          <div>
+            <p>• **bold** • *italic* • [link](url)</p>
+            <p>• Font sizes: XS to XXX-Large</p>
+            <p>• Text alignment: Left, Center, Right</p>
+          </div>
+          <div>
+            <p>• Section dividers: Simple & Gradient</p>
+            <p>• Images: Upload, resize, drag & drop</p>
+            <p>• Max image size: 5MB • Cloud storage</p>
+          </div>
+        </div>
+        <p><strong>Usage:</strong> Select text and click formatting buttons, or use buttons to insert elements at cursor position.</p>
       </div>
+
+      {/* Click outside to close dropdown */}
+      {showFontSizeDropdown && (
+        <div 
+          className="fixed inset-0 z-5" 
+          onMouseDown={() => setShowFontSizeDropdown(false)}
+        />
+      )}
     </div>
   );
 };
