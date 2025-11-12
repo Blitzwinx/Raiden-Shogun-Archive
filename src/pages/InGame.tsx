@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Sword, Shield, Zap, Calendar } from 'lucide-react';
 import { postService } from '../services/postService';
@@ -18,7 +18,7 @@ const InGame = () => {
       setPosts(data);
     } catch (error) {
       console.error('Error fetching posts:', error);
-      alert('Failed to fetch in-game posts. Please check your internet connection.');
+      alert('Failed to load in-game posts. Please check your internet connection.');
     } finally {
       setLoading(false);
     }
@@ -42,7 +42,7 @@ const InGame = () => {
       <div className="pt-16 min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-          <p className="text-gray-300">Loading guides from cloud...</p>
+          <p className="text-gray-300">Loading posts...</p>
         </div>
       </div>
     );

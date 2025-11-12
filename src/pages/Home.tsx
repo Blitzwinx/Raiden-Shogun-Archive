@@ -69,7 +69,7 @@ const Home = () => {
               <div className="grid grid-cols-3 gap-4 mb-8">
                 <div className="glass-morphism border border-purple-500/30 rounded-lg p-4 text-center">
                   <div className="text-xl sm:text-2xl font-bold text-purple-300">5000+</div>
-                  <div className="text-sm text-gray-400">Age</div>
+                  <div className="text-sm text-gray-400">Age (estimation)</div>
                 </div>
                 <div className="glass-morphism border border-purple-500/30 rounded-lg p-4 text-center">
                   <div className="text-lg sm:text-2xl font-bold text-purple-300 whitespace-nowrap">Female</div>
