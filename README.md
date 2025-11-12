@@ -20,6 +20,6 @@ Initially was not intended for public viewing and served only as my private note
 - [ ] Implement user accounts for public space (comment section)
 - [ ] Add scrollable bullet points of lore in chronological order
 - [ ] Improve UI (showcase multiple Raiden forms & clean flat color)
-- [ ] Improve mobile responsiveness
+- [x] Improve mobile responsiveness
 - [ ] Post pinning
 - [ ] AI Chatbot of Raiden Shogun
