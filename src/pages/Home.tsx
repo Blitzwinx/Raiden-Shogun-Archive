@@ -36,7 +36,8 @@ const Home = () => {
   return (
     <div className="pt-16 min-h-screen">
       {/* Hero Section with Split Layout */}
-      <div className="relative overflow-hidden min-h-screen flex items-center">
+      <div className="relative overflow-visible min-h-screen flex items-center">
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Side - Text Content */}
@@ -80,25 +81,6 @@ const Home = () => {
                   <div className="text-sm text-gray-400">Role</div>
                 </div>
               </div>
-
-              {/* Action Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link
-                  to="/lore"
-                  className="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 px-8 py-4 rounded-lg font-semibold transition-all duration-200 hover-lift text-lg"
-                >
-                  <Bookmark className="h-5 w-5" />
-                  <span>Explore Lore</span>
-                  <ArrowRight className="h-5 w-5" />
-                </Link>
-                <Link
-                  to="/ingame"
-                  className="inline-flex items-center justify-center space-x-2 glass-morphism border-2 border-purple-500/30 hover:border-purple-400/50 px-8 py-4 rounded-lg font-semibold transition-all duration-200 hover-lift text-lg"
-                >
-                  <Sword className="h-5 w-5" />
-                  <span>View Builds</span>
-                </Link>
-              </div>
             </div>
 
             {/* Right Side - Image Placeholder */}
@@ -111,8 +93,8 @@ const Home = () => {
       src="/splash.png"
       alt="Raiden Shogun - Electro Archon"
       className="w-full h-auto object-contain 
-                 transition-transform duration-300 ease-in-out
-                 group-hover:scale-110"
+                transition-transform duration-300 ease-in-out
+                group-hover:scale-110"
       style={{
         filter: "drop-shadow(0 0 50px rgba(168, 85, 247, 0.8))",
         display: "block"
@@ -125,7 +107,7 @@ const Home = () => {
       </div>
 
       {/* Sections Grid */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 pb-11">
         <div className="text-center mb-16">
           <h2 className="text-4xl font-bold gradient-text heading-font mb-4">
             Explore the Archive
@@ -170,7 +152,6 @@ const Home = () => {
       </div>
 
       {/* Quote Section */}
-      <div className="bg-purple-900/30 backdrop-blur-sm border-y border-purple-500/30">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
           <blockquote className="text-2xl md:text-3xl font-medium text-gray-200 italic heading-font mb-6">
             "Only through Eternity are you closest to the heavenly principles."
@@ -180,7 +161,6 @@ const Home = () => {
           </cite>
         </div>
       </div>
-    </div>
   );
 };
 
